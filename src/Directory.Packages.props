@@ -16,18 +16,18 @@
     <PackageVersion Include="Plugin.StoreReview" Version="6.2.0" />
     <PackageVersion Include="Uno.UITest.Helpers" Version="1.1.0-dev.70" />
     <PackageVersion Include="Xamarin.UITest" Version="4.3.4" />
-    <PackageVersion Include="WinUIEx" Version="2.4.0" />
+    <PackageVersion Include="WinUIEx" Version="2.5.0" />
     <PackageVersion Include="Uno.WinUI.MSAL" Version="5.1.104" />
     <PackageVersion Include="Microsoft.Graph" Version="5.56.0" />
     <PackageVersion Include="Microsoft.Identity.Client" Version="4.63.0" />
     <PackageVersion Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.63.0" />
-    <PackageVersion Include="LiveChartsCore.SkiaSharpView.Uno.WinUI" Version="2.0.0-rc2" />
+    <PackageVersion Include="LiveChartsCore.SkiaSharpView.Uno.WinUI" Version="2.0.0-rc4.5" />
     <PackageVersion Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Converters" Version="8.1.240821" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Animations" Version="8.1.240821" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Triggers" Version="8.1.240821" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.1.240821" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.1.240821" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Converters" Version="8.2.241112-preview1" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Animations" Version="8.2.241112-preview1" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Triggers" Version="8.2.241112-preview1" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.241112-preview1" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.241112-preview1" />
     <PackageVersion Include="Microsoft.AppCenter" Version="5.0.3" />
     <PackageVersion Include="Microsoft.AppCenter.Analytics" Version="5.0.3" />
     <PackageVersion Include="Microsoft.AppCenter.Crashes" Version="5.0.3" />

@@ -81,7 +81,7 @@ public partial class App : Application
         //FeatureConfiguration.Frame.UseWinUIBehavior = true;
 #endif
 
-#if WINDOWS
+#if WINDOWS && !DEBUG
         var manager = WindowManager.Get(builder.Window);
         manager.MinWidth = 500;
         manager.MinHeight = 500;
@@ -101,7 +101,7 @@ public partial class App : Application
 #endif
 
 #if DEBUG
-        MainWindow.EnableHotReload();
+        MainWindow.UseStudio();
 #endif
         MainWindow.SetWindowIcon();
 
