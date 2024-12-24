@@ -20,21 +20,6 @@
       <ColumnDefinition Width="Auto" />
     </Grid.ColumnDefinitions>
 
-    <VisualStateManager.VisualStateGroups>
-      <VisualStateGroup>
-        <VisualState />
-        <VisualState>
-          <VisualState.StateTriggers>
-            <triggers:IsNullOrEmptyStateTrigger Value="{x:Bind ViewModel.Items, Mode=OneWay}" />
-          </VisualState.StateTriggers>
-          <VisualState.Setters>
-            <Setter Target="itemsEmptyImage.Visibility"
-                    Value="Visible" />
-          </VisualState.Setters>
-        </VisualState>
-      </VisualStateGroup>
-    </VisualStateManager.VisualStateGroups>
-
     <ScrollViewer Grid.Row="1">
       <StackPanel Spacing="12"
                   Margin="{utu:Responsive Narrow={StaticResource MobileMargin}, Wide={StaticResource DesktopMargin}}">
@@ -42,6 +27,7 @@
         <utu:NavigationBar Content="{x:Bind ViewModel.WelcomeMessage}" />
 
         <Button uen:Navigation.Request="ItemEdit"
+                Command="{x:Bind ViewModel.AddItemCommand}"
                 Visibility="{utu:Responsive Narrow=Collapsed, Wide=Visible}"
                 Grid.Row="1"
                 Content="{cme:Localize Name=NewItem}" />
@@ -56,7 +42,6 @@
                        utu:ItemsRepeaterExtensions.SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
                        ScrollViewer.VerticalScrollMode="Disabled"
                        Grid.Row="2">
-          <!--uen:Navigation.Request="ItemDetails"-->
           <ItemsRepeater.Layout>
             <StackLayout Orientation="Vertical"
                          Spacing="{StaticResource ListItemsSpacing}" />
@@ -106,12 +91,11 @@
           </ItemsRepeater.ItemTemplate>
         </ItemsRepeater>
 
-        <StackPanel x:Name="itemsEmptyImage"
-                    Spacing="12"
+        <StackPanel Spacing="12"
                     Grid.Row="4"
                     VerticalAlignment="Center"
-                    Visibility="Collapsed"
-                    Margin="0,0,0,20">
+                    Margin="0,0,0,20"
+                    Visibility="{x:Bind ViewModel.Items, Mode=OneWay, Converter={StaticResource EmptyToVisibleConverter}}">
 
           <Image Source="/Recurrents/Assets/Illustrations/items_empty_illustration.png"
                  HorizontalAlignment="Center"
@@ -130,6 +114,7 @@
                      Opacity="0.7" />
 
           <Button uen:Navigation.Request="ItemEdit"
+                  Command="{x:Bind ViewModel.AddItemCommand}"
                   Content="{cme:Localize Name=NewItem}"
                   HorizontalAlignment="Center"
                   Visibility="{utu:Responsive Narrow=Collapsed, Wide=Visible}"
@@ -152,16 +137,15 @@
             Visibility="{utu:Responsive Narrow=Visible, Wide=Collapsed}">
 
       <StackPanel Orientation="Horizontal">
-        <SymbolIcon x:Name="fabIcon"
-                    Symbol="Add" />
+        <SymbolIcon Symbol="Add" />
 
         <TextBlock Text="{cme:Localize Name=NewItem}"
-                   Grid.Column="1"
                    Margin="12,0,0,0" />
       </StackPanel>
     </Button>
-<!--Visibility="{x:Bind ViewModel.SelectedItem, Mode=OneWay, Converter={StaticResource EmptyToVisibilityConverter}}"-->
-    <Border Grid.Column="2">
+    <!--Visibility="{x:Bind ViewModel.SelectedItem, Mode=OneWay, Converter={StaticResource EmptyToVisibilityConverter}}"-->
+    <Border Grid.Column="2"
+            Visibility="{x:Bind ViewModel.IsItemOpen, Mode=OneWay}">
       <ContentControl uen:Region.Attached="{utu:Responsive Narrow=False, Wide=True}"
                       Visibility="{utu:Responsive Narrow=Collapsed, Wide=Visible}"
                       HorizontalContentAlignment="Stretch"

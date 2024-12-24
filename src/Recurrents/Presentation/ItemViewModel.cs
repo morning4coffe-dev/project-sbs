@@ -44,16 +44,14 @@ public partial class ItemViewModel : ObservableObject
         }
     }
 
-    public int PaymentDate
-    {
-        get
-        {
-            return (GetFuturePayments(1).First().ToDateTime(new TimeOnly()) - DateTime.Today).Days;
-        }
-    }
+    public int PaymentDate => (GetFuturePayments(1).First().ToDateTime(new TimeOnly()) - DateTime.Today).Days;
 
     public string BillingCycle => _localization[Item?.Billing.PeriodType.ToString() ?? "N/A"];
-    public string? PaymentMethod => string.IsNullOrEmpty(Item?.Billing.PaymentMethod) ? "N/A" : Item?.Billing.PaymentMethod;
+    
+    public string? PaymentMethod => 
+        string.IsNullOrEmpty(Item?.Billing.PaymentMethod) 
+        ? "N/A" 
+        : Item?.Billing.PaymentMethod;
 
     public string FormattedPaymentDate
     {
@@ -139,7 +137,11 @@ public partial class ItemViewModel : ObservableObject
             return [];
         }
 
-        return _billingService.GetFuturePayments(billing.InitialDate, billing.PeriodType, billing.RecurEvery, numberOfPayments);
+        return _billingService.GetFuturePayments(
+            billing.InitialDate,
+            billing.PeriodType,
+            billing.RecurEvery,
+            numberOfPayments);
     }
 
     public IEnumerable<DateOnly> GetLastPayments()
@@ -149,7 +151,10 @@ public partial class ItemViewModel : ObservableObject
             return [];
         }
 
-        return _billingService.GetLastPayments(billing.InitialDate, billing.PeriodType, billing.RecurEvery);
+        return _billingService.GetLastPayments(
+            billing.InitialDate, 
+            billing.PeriodType, 
+            billing.RecurEvery);
     }
 
     public void Updated()

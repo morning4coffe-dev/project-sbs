@@ -3,8 +3,8 @@ namespace Recurrents.Models;
 public partial class Item : ObservableObject
 {
     public Item(
-        string? id,
-        string name,
+        string? id = default,
+        string name = "",
         BillingDetails? billing = default,
         int tagId = default,
         bool isNotify = true,
@@ -12,7 +12,7 @@ public partial class Item : ObservableObject
         DateTime creationDate = default,
         List<Status>? status = default)
     {
-        Id = id ?? Guid.NewGuid().ToString();
+        Id = id ?? Guid.NewGuid().ToString("N");
         Name = name;
         Billing = billing ?? new(5, DateOnly.FromDateTime(DateTime.Today));
         TagId = tagId;

@@ -162,7 +162,7 @@
                     Margin="6"
                     Spacing="20">
 
-          <Image Source="Assets/Icons/recurrents_icon.png"
+          <Image Source="ms-appx:///Assets/Icons/icon_foreground.png"
                  Width="48" />
 
           <StackPanel VerticalAlignment="Center"

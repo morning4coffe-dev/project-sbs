@@ -17,7 +17,6 @@
       utu:StatusBar.Foreground="Auto"
       mc:Ignorable="d not_win">
 
-
   <Grid uen:Region.Attached="True"
         utu:SafeArea.Insets="VisibleBounds"
         utu:SafeArea.Mode="Margin">
@@ -78,7 +77,7 @@
     <win:Grid>
       <winex:TitleBar Title="Recurrents">
         <winex:TitleBar.IconSource>
-          <ImageIconSource ImageSource="ms-appx:///Assets/Icons/icon.png" />
+          <ImageIconSource ImageSource="ms-appx:///Assets/Icons/icon_foreground.png" />
         </winex:TitleBar.IconSource>
       </winex:TitleBar>
     </win:Grid>

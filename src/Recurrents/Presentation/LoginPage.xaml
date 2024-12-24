@@ -53,7 +53,7 @@
       </Image.Source>
     </Image>
 
-    <Grid Background="{ThemeResource PageBackground}">
+    <Grid Style="{ThemeResource PageBackground}">
       <Grid.RowDefinitions>
         <RowDefinition Height="*" />
         <RowDefinition Height="1.1*" />

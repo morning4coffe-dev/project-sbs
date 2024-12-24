@@ -7,7 +7,7 @@ public class ItemService(IDataService dataService) : IItemService
 
     private readonly List<ItemViewModel> _items = [];
 
-    public event EventHandler<ItemViewModel>? OnItemChanged;
+    public event EventHandler<(ItemViewModel, Models.Action)>? OnItemChanged;
 
     public async Task InitializeAsync()
     {
@@ -37,37 +37,42 @@ public class ItemService(IDataService dataService) : IItemService
     public void AddOrUpdateItem(ItemViewModel item)
     {
         var index = _items.IndexOf(item);
+        Models.Action action;
         if (index >= 0)
         {
             _items[index] = item;
+            action = Models.Action.Update;
         }
         else
         {
             _items.Add(item);
+            action = Models.Action.Create;
         }
 
-        SaveDataAsync(item).ConfigureAwait(false);
+        _ = SaveDataAsync(item, action);
         item.Updated();
     }
 
     public void ArchiveItem(ItemViewModel item)
     {
         if (item?.Item is not { } i)
+        {
             return;
+        }
 
         i.Status.Add(new(item.IsArchived ? State.Active : State.Archived, DateTime.Now));
-        SaveDataAsync(item).ConfigureAwait(false);
+        _ = SaveDataAsync(item, Models.Action.Archive);
         item.Updated();
     }
 
     public void DeleteItem(ItemViewModel item)
     {
         _items.Remove(item);
-        SaveDataAsync(item).ConfigureAwait(false);
+        _ = SaveDataAsync(item, Models.Action.Delete);
         item.Updated();
     }
 
-    private async Task SaveDataAsync(ItemViewModel item)
+    private async Task SaveDataAsync(ItemViewModel item, Models.Action action)
     {
         var itemsList = _items.Select(itemViewModel => itemViewModel.Item).ToList();
 
@@ -76,8 +81,8 @@ public class ItemService(IDataService dataService) : IItemService
             await _dataService.SaveDataAsync(itemsList!);
         }
 
-        RaiseItemChanged(item);
+        RaiseItemChanged(item, action);
     }
 
-    private void RaiseItemChanged(ItemViewModel item) => OnItemChanged?.Invoke(this, item);
+    private void RaiseItemChanged(ItemViewModel item, Models.Action action) => OnItemChanged?.Invoke(this, (item, action));
 }

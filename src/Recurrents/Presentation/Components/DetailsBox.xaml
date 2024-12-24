@@ -24,7 +24,7 @@
                  TextWrapping="WrapWholeWords" />
 
       <ContentPresenter Content="{x:Bind Content}"
-                        Visibility="{x:Bind Content, Converter={StaticResource EmptyToVisibilityConverter}}" />
+                        Visibility="{x:Bind Content, Converter={StaticResource EmptyToCollapsedConverter}}" />
 
     </StackPanel>
   </Border>

@@ -40,7 +40,7 @@
                   Margin="{StaticResource MobileMargin}">
 
         <TextBox Header="{cme:Localize Name=Name}"
-                 Text="{Binding ViewModel.SelectedItem.Item.Name, Mode=TwoWay}"
+                 Text="{x:Bind ViewModel.SelectedItem.Item.Name, Mode=TwoWay}"
                  MaxLength="80" />
 
         <Grid ColumnSpacing="8">
@@ -50,20 +50,20 @@
           </Grid.ColumnDefinitions>
 
           <NumberBox Header="{cme:Localize Name=Price}"
-                     Value="{Binding ViewModel.SelectedItem.Item.Billing.BasePrice, Mode=TwoWay, Converter={StaticResource DecimalToDoubleConverter}}"
+                     Value="{x:Bind ViewModel.SelectedItem.Item.Billing.BasePrice, Mode=TwoWay, Converter={StaticResource DecimalToDoubleConverter}}"
                      SpinButtonPlacementMode="Inline"
                      AcceptsExpression="True"
                      Maximum="999999"
                      Minimum="-99999" />
           <ComboBox VerticalAlignment="Bottom"
                     ItemsSource="{x:Bind ViewModel.Currencies, Mode=OneWay}"
-                    SelectedItem="{Binding ViewModel.SelectedItem.Item.Billing.CurrencyId, Mode=TwoWay}"
+                    SelectedItem="{x:Bind ViewModel.SelectedItem.Item.Billing.CurrencyId, Mode=TwoWay}"
                     MinWidth="80"
                     Grid.Column="1" />
         </Grid>
 
         <CalendarDatePicker Header="{cme:Localize Name=PayingSince}"
-                            Date="{Binding ViewModel.SelectedItem.Item.Billing.InitialDate, Mode=TwoWay, Converter={StaticResource DateOnlyToDateTimeOffsetConverter}}"
+                            Date="{x:Bind ViewModel.SelectedItem.Item.Billing.InitialDate, Mode=TwoWay, Converter={StaticResource DateOnlyToDateTimeOffsetConverter}}"
                             IsTodayHighlighted="True"
                             HorizontalAlignment="Stretch" />
 
@@ -75,7 +75,7 @@
 
           <ComboBox Header="{cme:Localize Name=BillingCycle}"
                     ItemsSource="{toolkit:EnumValues Type=models:Period}"
-                    SelectedItem="{Binding ViewModel.SelectedItem.Item.Billing.PeriodType, Mode=TwoWay}"
+                    SelectedItem="{x:Bind ViewModel.SelectedItem.Item.Billing.PeriodType, Mode=TwoWay}"
                     HorizontalAlignment="Stretch">
             <!--TODO PaymentPeriodToLocalizedString fails when added to resources<ComboBox.ItemTemplate>
               <DataTemplate x:DataType="models:Period">
@@ -84,7 +84,7 @@
             </ComboBox.ItemTemplate>-->
           </ComboBox>
 
-          <NumberBox Value="{Binding ViewModel.SelectedItem.Item.Billing.RecurEvery, Mode=TwoWay}"
+          <NumberBox Value="{x:Bind ViewModel.SelectedItem.Item.Billing.RecurEvery, Mode=TwoWay}"
                      SpinButtonPlacementMode="Inline"
                      VerticalAlignment="Bottom"
                      AcceptsExpression="True"
@@ -96,10 +96,10 @@
           </Grid>
 
         <CheckBox Content="{cme:Localize Name=GetNotified}"
-                  IsChecked="{Binding ViewModel.SelectedItem.Item.IsNotify, Mode=TwoWay}" />
+                  IsChecked="{x:Bind ViewModel.SelectedItem.Item.IsNotify, Mode=TwoWay}" />
 
         <ComboBox ItemsSource="{x:Bind ViewModel.PaymentMethods}"
-                  SelectedValue="{Binding ViewModel.SelectedItem.Item.Billing.PaymentMethod, Mode=TwoWay}"
+                  SelectedValue="{x:Bind ViewModel.SelectedItem.Item.Billing.PaymentMethod, Mode=TwoWay}"
                   HorizontalAlignment="Stretch"
                   IsEditable="True">
           <ComboBox.Header>
@@ -112,7 +112,7 @@
           </ComboBox.Header>
         </ComboBox>
 
-        <TextBox Text="{Binding ViewModel.SelectedItem.Item.Description, Mode=TwoWay}"
+        <TextBox Text="{x:Bind ViewModel.SelectedItem.Item.Description, Mode=TwoWay}"
                  PlaceholderText="{cme:Localize Name=DescriptionPlaceholder}"
                  utu:InputExtensions.AutoDismiss="True"
                  Height="120"

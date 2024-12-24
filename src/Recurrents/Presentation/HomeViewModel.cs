@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Recurrents.Presentation;
 
 public partial class HomeViewModel : ObservableObject
@@ -20,6 +22,9 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     private string _sum = "0";
 
+    [ObservableProperty]
+    private bool _isItemOpen;
+
     private ItemViewModel? _selectedItem;
     public ItemViewModel? SelectedItem
     {
@@ -32,11 +37,12 @@ public partial class HomeViewModel : ObservableObject
             }
 
             _selectedItem = value;
+            IsItemOpen = value is { };
             OnPropertyChanged();
 
-            if (value is { })
+            if (value is { } item)
             {
-                _navigation.NavigateViewModelAsync<ItemDetailsViewModel>(this, data: value);
+                _navigation.NavigateViewModelAsync<ItemDetailsViewModel>(this, data: item);
             }
         }
     }
@@ -60,6 +66,13 @@ public partial class HomeViewModel : ObservableObject
 
         BannerHeader = string.Format(localizer["LastDays"], DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
 
+        Sum = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+        var informationalVersion = Assembly
+            .GetExecutingAssembly()
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion;
+
         WelcomeMessage = DateTime.Now.Hour switch
         {
             >= 5 and < 12 => localizer["GoodMorning"],
@@ -76,8 +89,19 @@ public partial class HomeViewModel : ObservableObject
             .GetItems(item => !item.IsArchived)
             .OrderBy(i => i.PaymentDate)];
 
+    [RelayCommand]
+    private void AddItem()
+    {
+        IsItemOpen = true;
+    }
+
     public async void Load()
     {
+        if (Items.Count != 0)
+        {
+            return;
+        }
+
         try
         {
             var currency = await _currency.GetCurrency(CancellationToken.None);
@@ -96,13 +120,7 @@ public partial class HomeViewModel : ObservableObject
 
         if (GetItems is { } items && items.Count > 0)
         {
-            foreach (var item in items)
-            {
-                await _dispatcher.ExecuteAsync(() =>
-                {
-                    Items.Add(item);
-                });
-            }
+            SortItems(items);
         }
 
         RefreshSum(Items);
@@ -115,53 +133,84 @@ public partial class HomeViewModel : ObservableObject
         _itemService.OnItemChanged -= OnItemChanged;
     }
 
-    private void OnItemChanged(object? sender, ItemViewModel e)
+    private async void OnItemChanged(object? sender, (ItemViewModel itemVM, Models.Action action) args)
     {
-        var items = _itemService.GetItems().ToList();
-
-        if (items is not { })
+        if (args.itemVM is not { } item)
         {
             return;
         }
 
-        for (int i = 0; i < items.Count; i++)
+        var modifiedItems = Items.ToList();
+
+        switch (args.action)
         {
-            if (items[i].Item.Id == e.Item.Id)
-            {
-                //if (!items[i].Equals(e)) //Equals doesn't work on all properties
-                Items[i] = e;
-                return;
-            }
+            case Models.Action.Create:
+                modifiedItems.Add(item);
+                break;
+
+            case Models.Action.Update:
+                var existingItem = modifiedItems.FirstOrDefault(item => item.Item.Id == item.Item.Id);
+                if (existingItem != null)
+                {
+                    var index = modifiedItems.IndexOf(existingItem);
+                    modifiedItems[index] = args.itemVM;
+                }
+                break;
+
+            case Models.Action.Archive:
+            case Models.Action.Delete:
+                modifiedItems.RemoveAll(item => item.Item.Id == item.Item.Id);
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(args.action), "Unexpected action");
         }
 
-        Items.Add(e);
+        Items.Clear();
+
+        SortItems(modifiedItems);
+
+        SelectedItem = null;
 
         RefreshSum(Items);
     }
 
+    private async void SortItems(List<ItemViewModel> items)
+    {
+        var sortedItems = items.OrderBy(i => i.PaymentDate).ThenBy(i => i.Item.Name).ToList();
+
+        await _dispatcher.ExecuteAsync(() =>
+        {
+            foreach (var item in sortedItems)
+            {
+                Items.Add(item);
+            }
+        });
+    }
+
     private async void RefreshSum(IEnumerable<ItemViewModel> items)
     {
-        try
-        {
-            var days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+        //try
+        //{
+        //    var days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
 
-            var tasks = items.Select(async item => await _currency.ConvertToDefaultCurrency(
-                item.Item?.Billing.BasePrice * item.GetPaymentsInPeriod(days) ?? 0,
-                item?.Item?.Billing?.CurrencyId ?? _settings.DefaultCurrency,
-                _settings.DefaultCurrency));
+        //    var tasks = items.Select(async item => await _currency.ConvertToDefaultCurrency(
+        //        item.Item?.Billing.BasePrice * item.GetPaymentsInPeriod(days) ?? 0,
+        //        item?.Item?.Billing?.CurrencyId ?? _settings.DefaultCurrency,
+        //        _settings.DefaultCurrency));
 
-            var values = await Task.WhenAll(tasks);
-            var sum = values.Sum();
+        //    var values = await Task.WhenAll(tasks);
+        //    var sum = values.Sum();
 
-            await _dispatcher.ExecuteAsync(() =>
-            {
-                Sum = $"≈ {Math.Round(sum, 2).ToString("C", CurrencyCache.CurrencyCultures[_settings.DefaultCurrency])}";
-            });
-        }
-        catch
-        {
-            //TODO: Make show Error more user friendly
-            Sum = "Connection error.";
-        }
+        //    await _dispatcher.ExecuteAsync(() =>
+        //    {
+        //        Sum = $"≈ {Math.Round(sum, 2).ToString("C", CurrencyCache.CurrencyCultures[_settings.DefaultCurrency])}";
+        //    });
+        //}
+        //catch
+        //{
+        //    //TODO: Make show Error more user friendly
+        //    Sum = "Connection error.";
+        //}
     }
 }

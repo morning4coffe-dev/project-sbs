@@ -2,7 +2,7 @@ namespace Recurrents.Services.Items;
 
 public interface IItemService
 {
-    event EventHandler<ItemViewModel> OnItemChanged;
+    event EventHandler<(ItemViewModel, Models.Action)> OnItemChanged;
     Task InitializeAsync();
     IEnumerable<ItemViewModel> GetItems(Func<ItemViewModel, bool>? selector = null);
     void ClearItems();

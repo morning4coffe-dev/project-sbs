@@ -82,7 +82,11 @@
                                                EmptyValue="False"
                                                NotEmptyValue="True" />
 
-      <converters:EmptyObjectToObjectConverter x:Key="EmptyToVisibilityConverter"
+      <converters:EmptyObjectToObjectConverter x:Key="EmptyToVisibleConverter"
+                                               EmptyValue="Visible"
+                                               NotEmptyValue="Collapsed" />
+
+      <converters:EmptyObjectToObjectConverter x:Key="EmptyToCollapsedConverter"
                                                EmptyValue="Collapsed"
                                                NotEmptyValue="Visible" />
 

@@ -31,7 +31,6 @@ public partial class ArchiveViewModel : ObservableObject
         RefreshItems();
     }
 
-
     private void RefreshItems()
     {
         var effectiveItems = _itemService.GetItems(item => item.IsArchived)
@@ -43,6 +42,7 @@ public partial class ArchiveViewModel : ObservableObject
             Items.AddRange(effectiveItems);
         });
     }
+
 
     [RelayCommand]
     public async Task Archive(ItemViewModel? item = null)
