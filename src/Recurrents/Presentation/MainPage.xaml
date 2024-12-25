@@ -75,7 +75,10 @@
     </Grid.RowDefinitions>
 
     <win:Grid>
-      <winex:TitleBar Title="Recurrents">
+      <winex:TitleBar Title="Recurrents"
+                      IsPaneToggleButtonVisible="true"
+                      PaneToggleRequested="TitleBar_PaneToggleRequested"
+                      Height="48">
         <winex:TitleBar.IconSource>
           <ImageIconSource ImageSource="ms-appx:///Assets/Icons/icon_foreground.png" />
         </winex:TitleBar.IconSource>
@@ -85,7 +88,7 @@
     <NavigationView x:Name="navigation"
                     uen:Region.Attached="True"
                     IsBackButtonVisible="Collapsed"
-                    IsPaneToggleButtonVisible="True"
+                    win:IsPaneToggleButtonVisible="False"
                     IsSettingsVisible="False"
                     IsPaneVisible="True"
                     Grid.Row="1">
@@ -164,19 +167,19 @@
                     MaxHeight="62"
                     CornerRadius="0"
                     Grid.Row="1">
-          
+
           <utu:TabBar.Items>
 
             <utu:TabBarItem uen:Region.Name="Home"
                             IsSelected="True"
-                            Icon="{toolkit:FontIcon Glyph=&#xE80F;, FontFamily={StaticResource SymbolThemeFontFamily}}"
-                             /><!--win:Icon="{toolkit:FontIcon Glyph=&#xE80F;}"-->
+                            Icon="{toolkit:FontIcon Glyph=&#xE80F;, FontFamily={StaticResource SymbolThemeFontFamily}}" />
+            <!--win:Icon="{toolkit:FontIcon Glyph=&#xE80F;}"-->
             <utu:TabBarItem uen:Region.Name="Archive"
                             Icon="{toolkit:FontIcon Glyph=&#xE7B8;, FontFamily={StaticResource SymbolThemeFontFamily}}" />
-                            <!--win:Icon="{toolkit:FontIcon Glyph=&#xE7B8;}"-->
+            <!--win:Icon="{toolkit:FontIcon Glyph=&#xE7B8;}"-->
             <utu:TabBarItem uen:Region.Name="Settings"
                             Icon="{toolkit:FontIcon Glyph=&#xE713;, FontFamily={StaticResource SymbolThemeFontFamily}}" />
-                            <!--win:Icon="{toolkit:FontIcon Glyph=&#xE713;}"-->
+            <!--win:Icon="{toolkit:FontIcon Glyph=&#xE713;}"-->
 
           </utu:TabBar.Items>
 

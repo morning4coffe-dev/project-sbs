@@ -22,3 +22,4 @@ global using Recurrents.Services.Items;
 global using Recurrents.Services.Interop;
 global using Recurrents.Services.Dialogs;
 global using Recurrents.Services.Settings;
+global using Recurrents.Services.Notifications;

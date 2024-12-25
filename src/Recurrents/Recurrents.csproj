@@ -47,9 +47,6 @@
       ThemeService;
     </UnoFeatures>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Assets\Icons\recurrents_icon.svg" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Plugin.StoreReview" />
@@ -91,6 +88,10 @@
 
   <ItemGroup>
     <UnoImage Update="Assets\recurrents-icon.svg" Link="Assets\Icons\recurrents-icon.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AndroidResource Remove="Platforms\Android\Resources\drawable\recurrents_notification_icon.png" />
   </ItemGroup>
 
 </Project>

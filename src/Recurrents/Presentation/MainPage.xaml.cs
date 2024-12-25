@@ -8,4 +8,11 @@ public sealed partial class MainPage : Page
     {
         this.InitializeComponent();
     }
+
+#if WINDOWS
+    private void TitleBar_PaneToggleRequested(WinUIEx.TitleBar sender, object args)
+    {
+        navigation.IsPaneOpen = !navigation.IsPaneOpen;
+    }
+#endif
 }

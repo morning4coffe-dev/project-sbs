@@ -14,135 +14,138 @@
       Background="{ThemeResource ApplicationBackground}"
       mc:Ignorable="d not_win">
 
-  <Grid Style="{ThemeResource PageBackground}">
+  <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*" />
       <ColumnDefinition Width="Auto" />
     </Grid.ColumnDefinitions>
 
-    <ScrollViewer Grid.Row="1">
-      <StackPanel Spacing="12"
-                  Margin="{utu:Responsive Narrow={StaticResource MobileMargin}, Wide={StaticResource DesktopMargin}}">
+    <Grid Style="{ThemeResource PageBackground}">
+      <ScrollViewer Grid.Row="1">
 
-        <utu:NavigationBar Content="{x:Bind ViewModel.WelcomeMessage}" />
+        <StackPanel Spacing="{StaticResource ListItemsSpacing}"
+                    Margin="{utu:Responsive Narrow={StaticResource MobileMargin}, Wide={StaticResource DesktopMargin}}">
 
-        <Button uen:Navigation.Request="ItemEdit"
-                Command="{x:Bind ViewModel.AddItemCommand}"
-                Visibility="{utu:Responsive Narrow=Collapsed, Wide=Visible}"
-                Grid.Row="1"
-                Content="{cme:Localize Name=NewItem}" />
+          <utu:NavigationBar Content="{x:Bind ViewModel.WelcomeMessage}" />
 
-        <comp:DetailsBox HeaderText="{x:Bind ViewModel.BannerHeader}">
-          <TextBlock Text="{x:Bind ViewModel.Sum, Mode=OneWay}"
-                     Style="{StaticResource SubtitleTextBlockStyle}" />
-        </comp:DetailsBox>
+          <Button uen:Navigation.Request="ItemEdit"
+                  Command="{x:Bind ViewModel.AddItemCommand}"
+                  Visibility="{utu:Responsive Narrow=Collapsed, Wide=Visible}"
+                  Grid.Row="1"
+                  Content="{cme:Localize Name=NewItem}" />
 
-        <ItemsRepeater ItemsSource="{x:Bind ViewModel.Items, Mode=OneWay}"
-                       utu:ItemsRepeaterExtensions.SelectionMode="Single"
-                       utu:ItemsRepeaterExtensions.SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
-                       ScrollViewer.VerticalScrollMode="Disabled"
-                       Grid.Row="2">
-          <ItemsRepeater.Layout>
-            <StackLayout Orientation="Vertical"
-                         Spacing="{StaticResource ListItemsSpacing}" />
-          </ItemsRepeater.Layout>
+          <comp:DetailsBox HeaderText="{x:Bind ViewModel.BannerHeader}">
+            <TextBlock Text="{x:Bind ViewModel.Sum, Mode=OneWay}"
+                       Style="{StaticResource SubtitleTextBlockStyle}" />
+          </comp:DetailsBox>
 
-          <ItemsRepeater.ItemTemplate>
-            <DataTemplate x:DataType="local:ItemViewModel">
-              <Grid BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    BorderThickness="{StaticResource ControlBorderThickness}"
-                    CornerRadius="{StaticResource ControlCornerRadius}"
-                    Padding="{StaticResource ListItemsPadding}">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*" />
-                  <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+          <ItemsRepeater ItemsSource="{x:Bind ViewModel.Items, Mode=OneWay}"
+                         utu:ItemsRepeaterExtensions.SelectionMode="Single"
+                         utu:ItemsRepeaterExtensions.SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
+                         ScrollViewer.VerticalScrollMode="Disabled"
+                         Grid.Row="2">
+            <ItemsRepeater.Layout>
+              <StackLayout Orientation="Vertical"
+                           Spacing="{StaticResource ListItemsSpacing}" />
+            </ItemsRepeater.Layout>
 
-                <!-- Left Column -->
-                <StackPanel Spacing="6"
-                            VerticalAlignment="Center">
-                  <!--<Rectangle Fill="{x:Bind DisplayTag.Color, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}"
+            <ItemsRepeater.ItemTemplate>
+              <DataTemplate x:DataType="local:ItemViewModel">
+                <Grid BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                      BorderThickness="{StaticResource ControlBorderThickness}"
+                      CornerRadius="{StaticResource ControlCornerRadius}"
+                      Padding="{StaticResource ListItemsPadding}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+
+                  <!-- Left Column -->
+                  <StackPanel Spacing="6"
+                              VerticalAlignment="Center">
+                    <!--<Rectangle Fill="{x:Bind DisplayTag.Color, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}"
                              Height="6"
                              Width="80"
                              RadiusY="3"
                              RadiusX="3"
                              HorizontalAlignment="Left" />-->
 
-                  <TextBlock Text="{x:Bind Item.Name, Mode=OneWay}"
-                             VerticalAlignment="Center"
-                             Style="{StaticResource SubtitleTextBlockStyle}" />
-                </StackPanel>
+                    <TextBlock Text="{x:Bind Item.Name, Mode=OneWay}"
+                               VerticalAlignment="Center"
+                               Style="{StaticResource SubtitleTextBlockStyle}" />
+                  </StackPanel>
 
-                <!--Right Column-->
-                <StackPanel Grid.Column="1"
-                            Spacing="8"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center">
-                  <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                             HorizontalAlignment="Right"
-                             Text="{x:Bind FormattedPrice, Mode=OneWay}" />
-                  <TextBlock Text="{x:Bind FormattedPaymentDate, Mode=OneWay}"
-                             HorizontalAlignment="Right"
-                             Opacity="0.75" />
-                </StackPanel>
-              </Grid>
-            </DataTemplate>
-          </ItemsRepeater.ItemTemplate>
-        </ItemsRepeater>
+                  <!--Right Column-->
+                  <StackPanel Grid.Column="1"
+                              Spacing="8"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                               HorizontalAlignment="Right"
+                               Text="{x:Bind FormattedPrice, Mode=OneWay}" />
+                    <TextBlock Text="{x:Bind FormattedPaymentDate, Mode=OneWay}"
+                               HorizontalAlignment="Right"
+                               Opacity="0.75" />
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+          </ItemsRepeater>
 
-        <StackPanel Spacing="12"
-                    Grid.Row="4"
-                    VerticalAlignment="Center"
-                    Margin="0,0,0,20"
-                    Visibility="{x:Bind ViewModel.Items, Mode=OneWay, Converter={StaticResource EmptyToVisibleConverter}}">
+          <StackPanel Spacing="12"
+                      Grid.Row="4"
+                      VerticalAlignment="Center"
+                      Margin="0,0,0,20"
+                      Visibility="{x:Bind ViewModel.Items, Mode=OneWay, Converter={StaticResource EmptyToVisibleConverter}}">
 
-          <Image Source="/Recurrents/Assets/Illustrations/items_empty_illustration.png"
-                 HorizontalAlignment="Center"
-                 MaxWidth="300"
-                 Margin="20" />
+            <Image Source="/Recurrents/Assets/Illustrations/items_empty_illustration.png"
+                   HorizontalAlignment="Center"
+                   MaxWidth="300"
+                   Margin="20" />
 
-          <TextBlock Text="{cme:Localize Name=ItemsEmptyTitle}"
-                     TextWrapping="WrapWholeWords"
-                     HorizontalAlignment="Center"
-                     Style="{StaticResource BaseTextBlockStyle}" />
+            <TextBlock Text="{cme:Localize Name=ItemsEmptyTitle}"
+                       TextWrapping="WrapWholeWords"
+                       HorizontalAlignment="Center"
+                       Style="{StaticResource BaseTextBlockStyle}" />
 
-          <TextBlock Text="{cme:Localize Name=ItemsEmptyDescription}"
-                     TextWrapping="WrapWholeWords"
-                     TextAlignment="Center"
-                     HorizontalAlignment="Center"
-                     Opacity="0.7" />
+            <TextBlock Text="{cme:Localize Name=ItemsEmptyDescription}"
+                       TextWrapping="WrapWholeWords"
+                       TextAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Opacity="0.7" />
 
-          <Button uen:Navigation.Request="ItemEdit"
-                  Command="{x:Bind ViewModel.AddItemCommand}"
-                  Content="{cme:Localize Name=NewItem}"
-                  HorizontalAlignment="Center"
-                  Visibility="{utu:Responsive Narrow=Collapsed, Wide=Visible}"
-                  Padding="20, 8" />
+            <Button uen:Navigation.Request="ItemEdit"
+                    Command="{x:Bind ViewModel.AddItemCommand}"
+                    Content="{cme:Localize Name=NewItem}"
+                    HorizontalAlignment="Center"
+                    Visibility="{utu:Responsive Narrow=Collapsed, Wide=Visible}"
+                    Padding="20, 8" />
 
+          </StackPanel>
         </StackPanel>
-      </StackPanel>
-    </ScrollViewer>
+      </ScrollViewer>
 
-    <Button uen:Navigation.Request="ItemEdit"
-            CornerRadius="22"
-            Height="65"
-            VerticalAlignment="Bottom"
-            HorizontalAlignment="Right"
-            AutomationProperties.Name="{cme:Localize Name=NewItem}"
-            Style="{ThemeResource AccentButtonStyle}"
-            Margin="20"
-            Padding="22,0"
-            Grid.Row="4"
-            Visibility="{utu:Responsive Narrow=Visible, Wide=Collapsed}">
+      <Button uen:Navigation.Request="ItemEdit"
+              CornerRadius="22"
+              Height="65"
+              VerticalAlignment="Bottom"
+              HorizontalAlignment="Right"
+              AutomationProperties.Name="{cme:Localize Name=NewItem}"
+              Style="{ThemeResource AccentButtonStyle}"
+              Margin="20"
+              Padding="22,0"
+              Grid.Row="4"
+              Visibility="{utu:Responsive Narrow=Visible, Wide=Collapsed}">
 
-      <StackPanel Orientation="Horizontal">
-        <SymbolIcon Symbol="Add" />
+        <StackPanel Orientation="Horizontal">
+          <SymbolIcon Symbol="Add" />
 
-        <TextBlock Text="{cme:Localize Name=NewItem}"
-                   Margin="12,0,0,0" />
-      </StackPanel>
-    </Button>
+          <TextBlock Text="{cme:Localize Name=NewItem}"
+                     Margin="12,0,0,0" />
+        </StackPanel>
+      </Button>
+    </Grid>
     <!--Visibility="{x:Bind ViewModel.SelectedItem, Mode=OneWay, Converter={StaticResource EmptyToVisibilityConverter}}"-->
     <Border Grid.Column="2"
             Visibility="{x:Bind ViewModel.IsItemOpen, Mode=OneWay}">

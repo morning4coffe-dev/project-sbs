@@ -1,18 +1,28 @@
 namespace Recurrents.Services.Items;
 
-public class ItemService(IDataService dataService) : IItemService
+public class ItemService(
+    IDataService dataService,
+    INotificationService notification,
+    IStringLocalizer localization,
+    ISettingsService settings) : IItemService
 {
     private readonly IDataService _dataService = dataService;
+    private readonly INotificationService _notification = notification;
+    private readonly IStringLocalizer _localization = localization;
+    private readonly ISettingsService _settings = settings;
+
     private bool _isInitialized = false;
 
     private readonly List<ItemViewModel> _items = [];
 
-    public event EventHandler<(ItemViewModel, Models.Action)>? OnItemChanged;
+    public event EventHandler<ItemViewModel>? OnItemChanged;
 
     public async Task InitializeAsync()
     {
         if (_isInitialized)
+        {
             return;
+        }
 
         var (items, _) = await _dataService.InitializeDatabaseAsync();
 
@@ -20,6 +30,13 @@ public class ItemService(IDataService dataService) : IItemService
         {
             var itemVM = new ItemViewModel(item);
             _items.Add(itemVM);
+
+            if (item?.Billing is { } billing && string.IsNullOrEmpty(billing.CurrencyId))
+            {
+                billing.CurrencyId = _settings.DefaultCurrency;
+            }
+
+            ScheduleBillingNotifications(itemVM);
         }
 
         _isInitialized = true;
@@ -37,20 +54,22 @@ public class ItemService(IDataService dataService) : IItemService
     public void AddOrUpdateItem(ItemViewModel item)
     {
         var index = _items.IndexOf(item);
-        Models.Action action;
         if (index >= 0)
         {
             _items[index] = item;
-            action = Models.Action.Update;
         }
         else
         {
             _items.Add(item);
-            action = Models.Action.Create;
+
+            if (item?.Item.Billing is { } billing && string.IsNullOrEmpty(billing.CurrencyId))
+            {
+                billing.CurrencyId = _settings.DefaultCurrency;
+            }
         }
 
-        _ = SaveDataAsync(item, action);
-        item.Updated();
+        _ = SaveDataAsync(item);
+        ScheduleBillingNotifications(item);
     }
 
     public void ArchiveItem(ItemViewModel item)
@@ -61,18 +80,18 @@ public class ItemService(IDataService dataService) : IItemService
         }
 
         i.Status.Add(new(item.IsArchived ? State.Active : State.Archived, DateTime.Now));
-        _ = SaveDataAsync(item, Models.Action.Archive);
-        item.Updated();
+        _ = SaveDataAsync(item);
+        ScheduleBillingNotifications(item);
     }
 
     public void DeleteItem(ItemViewModel item)
     {
         _items.Remove(item);
-        _ = SaveDataAsync(item, Models.Action.Delete);
-        item.Updated();
+        _ = SaveDataAsync(item);
+        ScheduleBillingNotifications(item);
     }
 
-    private async Task SaveDataAsync(ItemViewModel item, Models.Action action)
+    private async Task SaveDataAsync(ItemViewModel item)
     {
         var itemsList = _items.Select(itemViewModel => itemViewModel.Item).ToList();
 
@@ -81,8 +100,41 @@ public class ItemService(IDataService dataService) : IItemService
             await _dataService.SaveDataAsync(itemsList!);
         }
 
-        RaiseItemChanged(item, action);
+        RaiseItemChanged(item);
     }
 
-    private void RaiseItemChanged(ItemViewModel item, Models.Action action) => OnItemChanged?.Invoke(this, (item, action));
+    private void RaiseItemChanged(ItemViewModel item) => OnItemChanged?.Invoke(this, item);
+
+    public void ScheduleBillingNotifications(ItemViewModel itemVM)
+    {
+        if (itemVM?.Item is not { } item || !item.IsNotify || !_notification.IsEnabledOnDevice())
+        {
+            return;
+        }
+
+        var futurePayments = itemVM.GetFuturePayments(5);
+        foreach (var paymentDate in futurePayments)
+        {
+            if (_notification.IsNotificationScheduledForDate(paymentDate, item.Id))
+            {
+                continue;
+            }
+
+            var notificationId = Guid.NewGuid().ToString();
+            var title = string.Format(_localization["NotificationName"], item.Name);
+            var description = string.Format(
+                _localization["NotificationDescription"],
+                itemVM.FormattedPrice,
+                item.Name);
+
+            _notification.ScheduleNotification(
+                notificationId,
+                title,
+                description,
+                paymentDate.AddDays(-1),
+                _settings.NotificationTime);
+        }
+
+        //TODO add notification for the end of notifications for the item
+    }
 }

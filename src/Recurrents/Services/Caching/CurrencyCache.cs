@@ -14,6 +14,7 @@ public sealed class CurrencyCache(
     private static readonly SemaphoreSlim fileLock = new(1, 1);
 
     private Currency? _current;
+    public DateTime LastSync { get; private set; }
 
     public static IReadOnlyDictionary<string, CultureInfo> CurrencyCultures = new Dictionary<string, CultureInfo>
     {
@@ -150,6 +151,7 @@ public sealed class CurrencyCache(
         {
             try
             {
+                LastSync = properties.DateModified.DateTime;
                 return await File.ReadAllTextAsync(file.Path);
             }
             catch

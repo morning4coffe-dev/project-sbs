@@ -1,4 +1,6 @@
 using Uno.Resizetizer;
+using Recurrents.Services.Notifications;
+
 
 
 #if WINDOWS
@@ -62,6 +64,7 @@ public partial class App : Application
                     services.AddSingleton<IItemService, ItemService>();
                     services.AddSingleton<IDialogService, DialogService>();
                     services.AddSingleton<ISettingsService, SettingsService>();
+                    services.AddSingleton<INotificationService, NotificationService>();
                 })
                 .UseNavigation(RegisterRoutes)
             );
@@ -91,7 +94,9 @@ public partial class App : Application
         builder.Window.SetWindowSize(size.Width / 1.55, size.Height / 1.1);
         builder.Window.CenterOnScreen();
         builder.Window.Title = Package.Current.DisplayName;
+#endif
 
+#if WINDOWS
         if (MicaController.IsSupported())
         {
             MainWindow.SystemBackdrop = new MicaBackdrop() { Kind = MicaKind.Base };

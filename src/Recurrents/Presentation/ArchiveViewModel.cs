@@ -84,8 +84,4 @@ public partial class ArchiveViewModel : ObservableObject
             RefreshItems();
         }
     }
-
-    [RelayCommand]
-    private void OpenSettings()
-        => _navigation.NavigateViewModelAsync<SettingsViewModel>(this);
 }

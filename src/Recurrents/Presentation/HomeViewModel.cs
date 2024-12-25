@@ -85,9 +85,11 @@ public partial class HomeViewModel : ObservableObject
     }
 
     private List<ItemViewModel> GetItems
-        => [.. _itemService
-            .GetItems(item => !item.IsArchived)
-            .OrderBy(i => i.PaymentDate)];
+        => _itemService
+           .GetItems(item => !item.IsArchived)
+           .OrderBy(i => i.PaymentDate)
+           .ThenBy(i => i.Item.Name)
+           .ToList();
 
     [RelayCommand]
     private void AddItem()
@@ -113,17 +115,8 @@ public partial class HomeViewModel : ObservableObject
 
         await _itemService.InitializeAsync();
 
-        if (Items.Count > 0)
-        {
-            Items.Clear();
-        }
-
-        if (GetItems is { } items && items.Count > 0)
-        {
-            SortItems(items);
-        }
-
-        RefreshSum(Items);
+        RefreshItems();
+        RefreshStats(Items);
 
         _itemService.OnItemChanged += OnItemChanged;
     }
@@ -133,62 +126,34 @@ public partial class HomeViewModel : ObservableObject
         _itemService.OnItemChanged -= OnItemChanged;
     }
 
-    private async void OnItemChanged(object? sender, (ItemViewModel itemVM, Models.Action action) args)
+    private async void OnItemChanged(object? sender, ItemViewModel itemVM)
     {
-        if (args.itemVM is not { } item)
-        {
-            return;
-        }
-
-        var modifiedItems = Items.ToList();
-
-        switch (args.action)
-        {
-            case Models.Action.Create:
-                modifiedItems.Add(item);
-                break;
-
-            case Models.Action.Update:
-                var existingItem = modifiedItems.FirstOrDefault(item => item.Item.Id == item.Item.Id);
-                if (existingItem != null)
-                {
-                    var index = modifiedItems.IndexOf(existingItem);
-                    modifiedItems[index] = args.itemVM;
-                }
-                break;
-
-            case Models.Action.Archive:
-            case Models.Action.Delete:
-                modifiedItems.RemoveAll(item => item.Item.Id == item.Item.Id);
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(args.action), "Unexpected action");
-        }
-
-        Items.Clear();
-
-        SortItems(modifiedItems);
+        RefreshItems();
+        RefreshStats(Items);
 
         SelectedItem = null;
-
-        RefreshSum(Items);
     }
 
-    private async void SortItems(List<ItemViewModel> items)
+    private async void RefreshItems()
     {
-        var sortedItems = items.OrderBy(i => i.PaymentDate).ThenBy(i => i.Item.Name).ToList();
-
-        await _dispatcher.ExecuteAsync(() =>
+        if (GetItems is { } items && items.Count > 0)
         {
-            foreach (var item in sortedItems)
+            await _dispatcher.ExecuteAsync(() =>
             {
-                Items.Add(item);
-            }
-        });
+                if (Items.Count > 0)
+                {
+                    Items.Clear();
+                }
+
+                foreach (var item in items)
+                {
+                    Items.Add(item);
+                }
+            });
+        }
     }
 
-    private async void RefreshSum(IEnumerable<ItemViewModel> items)
+    private async void RefreshStats(IEnumerable<ItemViewModel> items)
     {
         //try
         //{

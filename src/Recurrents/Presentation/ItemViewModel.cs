@@ -2,128 +2,77 @@ namespace Recurrents.Presentation;
 
 public partial class ItemViewModel : ObservableObject
 {
-    private readonly IBillingService _billingService;
-    //private readonly INotificationService _notification;
+    private readonly IBillingService _billing;
     private readonly IStringLocalizer _localization;
-    private readonly ISettingsService _settingsService;
+    private readonly ISettingsService _settings;
     private readonly ICurrencyCache _currency;
+
+    private const string DEFAULT_CURRENCY = "EUR";
 
     public ItemViewModel(Item item)
     {
-        _item = item;
-
-        _billingService = App.Services?.GetRequiredService<IBillingService>()!;
-        //#if !HAS_UNO || __ANDROID__
-        //        _notification = App.Services?.GetRequiredService<INotificationService>()!;
-        //#endif
-        _localization = App.Services?.GetRequiredService<IStringLocalizer>()!;
-        _settingsService = App.Services?.GetRequiredService<ISettingsService>()!;
-        _currency = App.Services?.GetService<ICurrencyCache>()!;
-
-        if (item?.Billing is { } billing && string.IsNullOrEmpty(billing.CurrencyId))
-        {
-            billing.CurrencyId = _settingsService.DefaultCurrency;
-        }
-
-        ScheduleBilling();
+        _item = item ?? throw new ArgumentNullException(nameof(item));
+        _billing = App.Services?.GetRequiredService<IBillingService>() ?? throw new ArgumentNullException(nameof(_billing));
+        _localization = App.Services?.GetRequiredService<IStringLocalizer>() ?? throw new ArgumentNullException(nameof(_localization));
+        _settings = App.Services?.GetRequiredService<ISettingsService>() ?? throw new ArgumentNullException(nameof(_settings));
+        _currency = App.Services?.GetRequiredService<ICurrencyCache>() ?? throw new ArgumentNullException(nameof(_currency));
     }
 
     [ObservableProperty]
     private Item _item;
 
-    public Tag? DisplayTag
-    {
-        get
-        {
-            if (Item is not { } item)
-            {
-                return null;
-            }
+    public Tag? DisplayTag => new(0, "Test", System.Drawing.Color.Aqua);
+    //Item?.TagId != null                                                                            
+    //? App.Services?.GetRequiredService<ITagService>().Tags.FirstOrDefault(tag => tag.Id == Item.TagId)                                                              
+    //: null;
 
-            return null;//App.Services?.GetRequiredService<ITagService>().Tags.FirstOrDefault(tag => tag.Id == item.TagId);
-        }
-    }
+    public int PaymentDate => (GetFuturePayments(1).FirstOrDefault().ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
 
-    public int PaymentDate => (GetFuturePayments(1).First().ToDateTime(new TimeOnly()) - DateTime.Today).Days;
+    public string BillingCycle => _localization[Item?.Billing?.PeriodType.ToString() ?? "N/A"];
 
-    public string BillingCycle => _localization[Item?.Billing.PeriodType.ToString() ?? "N/A"];
-    
-    public string? PaymentMethod => 
-        string.IsNullOrEmpty(Item?.Billing.PaymentMethod) 
-        ? "N/A" 
-        : Item?.Billing.PaymentMethod;
+    public string PaymentMethod => Item?.Billing?.PaymentMethod ?? "N/A";
 
-    public string FormattedPaymentDate
-    {
-        get
-        {
-            var remaining = PaymentDate;
-
-            if (remaining == 1)
-            {
-                return $"{_localization["Tomorrow"]}".ToLower();
-            }
-
-            return $"{_localization["InTime"]} {remaining.ToString() ?? "N/A"} {_localization["Days"]}";
-        }
-    }
+    public string FormattedPaymentDate => PaymentDate == 1
+                ? _localization["Tomorrow"].ToString().ToLower()
+                : $"{_localization["InTime"]} {PaymentDate} {_localization["Days"]}";
 
     public decimal TotalPrice
     {
         get
         {
             if (Item?.Billing is not { } billing)
-            {
                 return 0M;
-            }
 
-            var dates = _billingService.GetLastPayments(billing.InitialDate, billing.PeriodType, billing.RecurEvery);
+            var dates = _billing.GetLastPayments(
+                billing.InitialDate,
+                billing.PeriodType,
+                billing.RecurEvery);
 
-            //TODO Doesn't account for currency or the previous value of the currency
-            return Enumerable.Count(dates) * billing.BasePrice;
+            return dates.Count() * billing.BasePrice;
         }
     }
 
-    public string FormattedTotalPrice =>
-        TotalPrice.ToString("C", CurrencyCache.CurrencyCultures[Item?.Billing.CurrencyId ?? "EUR"]);
+    public string FormattedTotalPrice => FormatPrice(TotalPrice);
 
-    public string FormattedPrice =>
-        $"{Item?.Billing.BasePrice.ToString("C", CurrencyCache.CurrencyCultures[Item?.Billing.CurrencyId ?? "EUR"])}";
-        //var task = _currency.ConvertToDefaultCurrency(
-        //    Item?.Billing.BasePrice ?? 0,
-        //    Item?.Billing.CurrencyId ?? "EUR",
-        //    _settingsService.DefaultCurrency);
+    public string FormattedPrice => FormatPrice(Item?.Billing?.BasePrice ?? 0M);
 
-
-    private Status? GetLastStatus()
+    private string FormatPrice(decimal amount)
     {
-        if (Item?.Status is not { } itemStatus || Item?.Status.Count == 0)
-        {
-            return null;
-        }
-
-        return itemStatus.OrderByDescending(s => s.Date).First();
+        var currencyId = Item?.Billing?.CurrencyId ?? DEFAULT_CURRENCY;
+        return amount.ToString("C", CurrencyCache.CurrencyCultures[currencyId]);
     }
+
+    private Status? GetLastStatus() =>
+        Item?.Status?.OrderByDescending(s => s.Date).FirstOrDefault();
 
     public bool IsArchived => GetLastStatus()?.State == State.Archived;
 
-    public DateOnly? ArchiveDate
-    {
-        get
-        {
-            if (GetLastStatus() is not { } dateTime)
-            {
-                return null;
-            }
-
-            return DateOnly.FromDateTime(dateTime.Date);
-        }
-    }
+    public DateOnly? ArchiveDate =>
+        GetLastStatus() is { } status ? DateOnly.FromDateTime(status.Date) : null;
 
     public int GetPaymentsInPeriod(int periodDays, int offsetDays = 0)
     {
         var dates = GetLastPayments().ToArray();
-
         var startDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-((periodDays + offsetDays) - 1)));
         var endDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-(offsetDays - 1)));
 
@@ -133,11 +82,9 @@ public partial class ItemViewModel : ObservableObject
     public IEnumerable<DateOnly> GetFuturePayments(int numberOfPayments = 12)
     {
         if (Item?.Billing is not { } billing)
-        {
-            return [];
-        }
+            return Array.Empty<DateOnly>();
 
-        return _billingService.GetFuturePayments(
+        return _billing.GetFuturePayments(
             billing.InitialDate,
             billing.PeriodType,
             billing.RecurEvery,
@@ -147,57 +94,11 @@ public partial class ItemViewModel : ObservableObject
     public IEnumerable<DateOnly> GetLastPayments()
     {
         if (Item?.Billing is not { } billing)
-        {
-            return [];
-        }
+            return Array.Empty<DateOnly>();
 
-        return _billingService.GetLastPayments(
-            billing.InitialDate, 
-            billing.PeriodType, 
+        return _billing.GetLastPayments(
+            billing.InitialDate,
+            billing.PeriodType,
             billing.RecurEvery);
-    }
-
-    public void Updated()
-    {
-        ScheduleBilling();
-    }
-
-#pragma warning disable CS1998
-    // Async method lacks 'await' operators and will run synchronously as it is currently implemented only for Windows
-    public async void ScheduleBilling()
-    {
-#if !HAS_UNO
-        if (Item is not { } item || !Item.IsNotify)
-        {
-            return;
-        }
-
-        //_notification.RemoveScheduledNotifications();
-
-        //if (!_notification.IsEnabledOnDevice())
-        //{
-        //    //TODO Notify user that notifications are disabled
-        //    return;
-        //}
-
-
-        var paymentDates = GetFuturePayments();
-
-        var tasks = paymentDates.Select(date =>
-        Task.Run(() =>
-        {
-            var title = string.Format(_localization["NotificationName"], item.Name);
-            //(≈{2})
-            //var text = string.Format(_localization["NotificationDescription"], item.Billing.BasePrice.ToString("C", CurrencyCache.CurrencyCultures[Item?.Billing.CurrencyId ?? "EUR"]), item.Name);
-
-            //- time period before e.g. one day, time that user selected
-            //DEBUG
-            //_notification.ScheduleNotification(item.Id, title, text, DateOnly.FromDateTime(DateTime.Now), TimeOnly.FromDateTime(DateTime.Now.AddSeconds(2)));
-
-            //_notification.ScheduleNotification(item.Id, title, text, date.AddDays(-1), _settingsService.NotificationTime);
-        })).ToArray();
-
-        await Task.WhenAll(tasks);
-#endif
     }
 }

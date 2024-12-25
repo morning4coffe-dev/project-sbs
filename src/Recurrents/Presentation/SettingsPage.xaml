@@ -17,12 +17,8 @@
   <Page.Resources>
     <Style x:Key="IconButtonStyle"
            TargetType="Button">
-      <Setter Property="Width"
-              Value="70" />
-      <Setter Property="Height"
-              Value="70" />
       <Setter Property="HorizontalAlignment"
-              Value="Center" />
+              Value="Stretch" />
       <Setter Property="VerticalAlignment"
               Value="Center" />
       <Setter Property="Background"
@@ -33,41 +29,60 @@
               Value="{ThemeResource ButtonBorderThemeThickness}" />
       <Setter Property="CornerRadius"
               Value="{StaticResource ControlCornerRadius}" />
+      <Setter Property="Padding"
+              Value="16" />
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
-            <Grid>
-              <Border Background="{TemplateBinding Background}"
-                      BorderBrush="{TemplateBinding BorderBrush}"
-                      BorderThickness="{TemplateBinding BorderThickness}"
-                      CornerRadius="{TemplateBinding CornerRadius}">
-                <ContentPresenter HorizontalAlignment="Center"
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    Padding="{TemplateBinding Padding}"
+                    Margin="{TemplateBinding Margin}"
+                    ToolTipService.ToolTip="{TemplateBinding Tag}">
+              <Grid HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    RowSpacing="4">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ContentPresenter Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  HorizontalAlignment="Center"
                                   VerticalAlignment="Center"
-                                  Content="{TemplateBinding Content}"
-                                  ContentTemplate="{TemplateBinding ContentTemplate}" />
-              </Border>
-            </Grid>
+                                  Grid.Row="0" />
+
+                <TextBlock Text="{TemplateBinding Tag}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Grid.Row="1" />
+              </Grid>
+            </Border>
           </ControlTemplate>
         </Setter.Value>
       </Setter>
     </Style>
   </Page.Resources>
 
-  <ScrollViewer Grid.Row="1">
+  <Grid Style="{ThemeResource PageBackground}">
+    <ScrollViewer Grid.Row="1">
 
-    <StackPanel Spacing="{StaticResource ListItemsSpacing}"
-                Margin="{utu:Responsive Narrow={StaticResource MobileMargin}, Wide={StaticResource DesktopMargin}}">
-      <win:StackPanel.ChildrenTransitions>
-        <TransitionCollection>
-          <EntranceThemeTransition FromVerticalOffset="-100"
-                                   IsStaggeringEnabled="True" />
-        </TransitionCollection>
-      </win:StackPanel.ChildrenTransitions>
+      <StackPanel Spacing="{StaticResource ListItemsSpacing}"
+                  Margin="{utu:Responsive Narrow={StaticResource MobileMargin}, Wide={StaticResource DesktopMargin}}">
+        <!--<win:StackPanel.ChildrenTransitions>
+          <TransitionCollection>
+            <EntranceThemeTransition FromVerticalOffset="-100"
+                                     IsStaggeringEnabled="True" />
+          </TransitionCollection>
+        </win:StackPanel.ChildrenTransitions>-->
 
-      <utu:NavigationBar Content="{cme:Localize Name=Settings}" />
+        <utu:NavigationBar Content="{cme:Localize Name=Settings}" />
 
-      <!--, Converter={StaticResource TrueToVisibleConverter}-->
-      <!--<controls:SettingsCard Visibility="{x:Bind ViewModel.IsLoggedIn, Mode=OneWay}">
+        <!--, Converter={StaticResource TrueToVisibleConverter}-->
+        <!--<controls:SettingsCard Visibility="{x:Bind ViewModel.IsLoggedIn, Mode=OneWay}">
         <controls:SettingsCard.Header>
           <StackPanel Orientation="Horizontal"
                       Margin="6"
@@ -88,7 +103,7 @@
                 Command="{x:Bind ViewModel.LogoutCommand}" />
       </controls:SettingsCard>-->
 
-      <!--<InfoBar Title="{cme:Localize Name=NotLoggedIn}"
+        <!--<InfoBar Title="{cme:Localize Name=NotLoggedIn}"
                Message="{cme:Localize Name=NotLoggedInDescription}"
                Visibility="{x:Bind ViewModel.IsLoggedIn, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"
                IsOpen="True"
@@ -104,33 +119,41 @@
                   Command="{x:Bind ViewModel.LoginCommand}" />
         </InfoBar.ActionButton>
       </InfoBar>-->
+        <controls:SettingsCard Header="{cme:Localize Name=SystemLanguageAndRegion}"
+                               ActionIcon="{toolkit:FontIcon Glyph=&#xE8A7;, FontFamily={StaticResource SymbolThemeFontFamily}}"
+                               HeaderIcon="{toolkit:FontIcon Glyph=&#xF2B7;, FontFamily={StaticResource SymbolThemeFontFamily}}"
+                               IsClickEnabled="True"
+                               Command="{x:Bind ViewModel.LaunchLangSettingsCommand}" />
 
-      <controls:SettingsCard Header="{cme:Localize Name=DefaultCurrency}"
-                             HeaderIcon="{toolkit:FontIcon Glyph=&#xE8C7;, FontFamily={StaticResource SymbolThemeFontFamily}}">
-        <ComboBox VerticalAlignment="Bottom"
-                  ItemsSource="{x:Bind ViewModel.Currencies, Mode=OneWay}"
-                  SelectedItem="{x:Bind ViewModel.SelectedCurrency, Mode=TwoWay}"
-                  HorizontalAlignment="{utu:Responsive Narrow=Stretch, Wide=Left}"
-                  Grid.Column="1" />
-      </controls:SettingsCard>
+        <TextBlock Text="{cme:Localize Name=Currency}"
+                   Margin="0,12,0,0"
+                   Style="{StaticResource BaseTextBlockStyle}" />
 
-      <controls:SettingsCard Header="{cme:Localize Name=SystemLanguageAndRegion}"
-                             ActionIcon="{toolkit:FontIcon Glyph=&#xE8A7;, FontFamily={StaticResource SymbolThemeFontFamily}}"
-                             HeaderIcon="{toolkit:FontIcon Glyph=&#xF2B7;, FontFamily={StaticResource SymbolThemeFontFamily}}"
-                             IsClickEnabled="True"
-                             Command="{x:Bind ViewModel.LaunchLangSettingsCommand}" />
+        <controls:SettingsCard Header="{cme:Localize Name=LastSuccessCurrencySync}"
+                               HeaderIcon="{toolkit:FontIcon Glyph=&#xE895;, FontFamily={StaticResource SymbolThemeFontFamily}}">
+          <TextBlock Text="{x:Bind ViewModel.LastCurrencySync}" />
+        </controls:SettingsCard>
 
-      <TextBlock Text="{cme:Localize Name=Notifications}"
-                 Margin="0,12,0,0"
-                 Style="{StaticResource BaseTextBlockStyle}" />
+        <controls:SettingsCard Header="{cme:Localize Name=DefaultCurrency}"
+                               HeaderIcon="{toolkit:FontIcon Glyph=&#xE8C7;, FontFamily={StaticResource SymbolThemeFontFamily}}">
+          <ComboBox VerticalAlignment="Bottom"
+                    ItemsSource="{x:Bind ViewModel.Currencies, Mode=OneWay}"
+                    SelectedItem="{x:Bind ViewModel.SelectedCurrency, Mode=TwoWay}"
+                    HorizontalAlignment="{utu:Responsive Narrow=Stretch, Wide=Left}"
+                    Grid.Column="1" />
+        </controls:SettingsCard>
 
-      <controls:SettingsCard Header="{cme:Localize Name=SystemNotifications}"
-                             ActionIcon="{toolkit:FontIcon Glyph=&#xE8A7;, FontFamily={StaticResource SymbolThemeFontFamily}}"
-                             HeaderIcon="{toolkit:FontIcon Glyph=&#xEA8F;, FontFamily={StaticResource SymbolThemeFontFamily}}"
-                             IsClickEnabled="True"
-                             Command="{x:Bind ViewModel.LaunchNotificationSettingsCommand}" />
+        <TextBlock Text="{cme:Localize Name=Notifications}"
+                   Margin="0,12,0,0"
+                   Style="{StaticResource BaseTextBlockStyle}" />
 
-      <!--<Border>
+        <controls:SettingsCard Header="{cme:Localize Name=SystemNotifications}"
+                               ActionIcon="{toolkit:FontIcon Glyph=&#xE8A7;, FontFamily={StaticResource SymbolThemeFontFamily}}"
+                               HeaderIcon="{toolkit:FontIcon Glyph=&#xEA8F;, FontFamily={StaticResource SymbolThemeFontFamily}}"
+                               IsClickEnabled="True"
+                               Command="{x:Bind ViewModel.LaunchNotificationSettingsCommand}" />
+
+        <!--<Border>
         <controls:SettingsCard Header="{cme:Localize Name=NotificationTime}"
                                HeaderIcon="{toolkit:FontIcon Glyph=&#xE823;, FontFamily={StaticResource SymbolThemeFontFamily}}">
           <TimePicker SelectedTime="{x:Bind ViewModel.NotificationTime, Mode=TwoWay}", Converter={StaticResource TimeOnlyToTimeSpanConverter} />
@@ -153,58 +176,67 @@
         </InfoBar.ActionButton>
       </InfoBar>-->
 
-      <TextBlock Text="{cme:Localize Name=About}"
-                 Margin="0,12,0,0"
-                 Style="{StaticResource BaseTextBlockStyle}" />
+        <TextBlock Text="{cme:Localize Name=About}"
+                   Margin="0,12,0,0"
+                   Style="{StaticResource BaseTextBlockStyle}" />
 
-      <comp:DetailsBox>
-        <StackPanel Orientation="Horizontal"
-                    Margin="6"
-                    Spacing="20">
+        <comp:DetailsBox>
+          <StackPanel Orientation="Horizontal"
+                      Margin="6"
+                      Spacing="20">
 
-          <Image Source="ms-appx:///Assets/Icons/icon_foreground.png"
-                 Width="48" />
+            <Image Source="ms-appx:///Assets/Icons/icon_foreground.png"
+                   Width="48" />
 
-          <StackPanel VerticalAlignment="Center"
-                      Spacing="4">
-            <TextBlock Text="{cme:Localize Name=ApplicationName}" />
-            <TextBlock Text="Morning4coffe ©️ 2024"
-                       Opacity="0.75"
-                       Style="{StaticResource CaptionTextBlockStyle}" />
-            <TextBlock Text="{x:Bind ViewModel.AppVersion}"
-                       Opacity="0.75"
-                       IsTextSelectionEnabled="True"
-                       Style="{StaticResource CaptionTextBlockStyle}" />
+            <StackPanel VerticalAlignment="Center"
+                        Spacing="4">
+              <TextBlock Text="{cme:Localize Name=ApplicationName}" />
+              <TextBlock Text="Morning4coffe ©️ 2024"
+                         Opacity="0.75"
+                         Style="{StaticResource CaptionTextBlockStyle}" />
+              <TextBlock Text="{x:Bind ViewModel.AppVersion}"
+                         Opacity="0.75"
+                         IsTextSelectionEnabled="True"
+                         Style="{StaticResource CaptionTextBlockStyle}" />
+            </StackPanel>
           </StackPanel>
-        </StackPanel>
-      </comp:DetailsBox>
+        </comp:DetailsBox>
 
-      <StackPanel Orientation="Horizontal"
-                  Spacing="4">
+        <Grid ColumnSpacing="{StaticResource ListItemsSpacing}">
 
-        <Button Command="{x:Bind ViewModel.OpenRateAndReviewCommand}"
-                ToolTipService.ToolTip="{cme:Localize Name=RateAndReview}"
-                Content="{toolkit:FontIcon Glyph=&#xEB51;, FontFamily={StaticResource SymbolThemeFontFamily}}"
-                Style="{StaticResource IconButtonStyle}" />
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
 
-        <Button Command="{x:Bind ViewModel.OpenGithubCommand}"
-                ToolTipService.ToolTip="{cme:Localize Name=GitHub}"
-                Content="{toolkit:FontIcon Glyph=&#xE8D5;, FontFamily={StaticResource SymbolThemeFontFamily}}"
-                Style="{StaticResource IconButtonStyle}" />
+          <Button Command="{x:Bind ViewModel.OpenRateAndReviewCommand}"
+                  Tag="{cme:Localize Name=RateAndReview}"
+                  Content="{toolkit:FontIcon Glyph=&#xEB51;, FontFamily={StaticResource SymbolThemeFontFamily}}"
+                  Style="{StaticResource IconButtonStyle}" />
 
-        <Button Command="{x:Bind ViewModel.OpenPrivacyPolicyCommand}"
-                ToolTipService.ToolTip="{cme:Localize Name=PrivacyPolicy}"
-                Content="{toolkit:FontIcon Glyph=&#xE8FD;, FontFamily={StaticResource SymbolThemeFontFamily}}"
-                Style="{StaticResource IconButtonStyle}" />
+          <Button Command="{x:Bind ViewModel.OpenGithubCommand}"
+                  Tag="{cme:Localize Name=GitHub}"
+                  Content="{toolkit:FontIcon Glyph=&#xE8D5;, FontFamily={StaticResource SymbolThemeFontFamily}}"
+                  Style="{StaticResource IconButtonStyle}"
+                  Grid.Column="1" />
 
-        <Button Command="{x:Bind ViewModel.OpenGithubIssuesCommand}"
-                ToolTipService.ToolTip="{cme:Localize Name=ReportABug}"
-                Content="{toolkit:FontIcon Glyph=&#xEBE8;, FontFamily={StaticResource SymbolThemeFontFamily}}"
-                Style="{StaticResource IconButtonStyle}" />
+          <Button Command="{x:Bind ViewModel.OpenPrivacyPolicyCommand}"
+                  Tag="{cme:Localize Name=PrivacyPolicy}"
+                  Content="{toolkit:FontIcon Glyph=&#xE8FD;, FontFamily={StaticResource SymbolThemeFontFamily}}"
+                  Style="{StaticResource IconButtonStyle}"
+                  Grid.Column="2" />
 
-      </StackPanel>
+          <Button Command="{x:Bind ViewModel.OpenGithubIssuesCommand}"
+                  Tag="{cme:Localize Name=ReportABug}"
+                  Content="{toolkit:FontIcon Glyph=&#xEBE8;, FontFamily={StaticResource SymbolThemeFontFamily}}"
+                  Style="{StaticResource IconButtonStyle}"
+                  Grid.Column="3" />
 
-      <!--<controls:SettingsExpander IsExpanded="True">
+        </Grid>
+
+        <!--<controls:SettingsExpander IsExpanded="True">
           <controls:SettingsExpander.Header>
             <StackPanel Orientation="Horizontal"
                         Margin="6"
@@ -252,6 +284,7 @@
                      Style="{StaticResource CaptionTextBlockStyle}" />
         </controls:SettingsExpander>-->
 
-    </StackPanel>
-  </ScrollViewer>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
 </Page>

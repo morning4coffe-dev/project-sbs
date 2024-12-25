@@ -59,8 +59,8 @@
       <Color x:Key="SystemAccentColorDark2">#115214</Color>
       <Color x:Key="SystemAccentColorDark3">#061f07</Color>
 
-      <not_win:CornerRadius x:Key="ControlCornerRadius">12</not_win:CornerRadius>
-      <win:CornerRadius x:Key="ControlCornerRadius">8</win:CornerRadius>
+      <not_win:CornerRadius x:Key="ControlCornerRadius">8</not_win:CornerRadius>
+      <win:CornerRadius x:Key="ControlCornerRadius">4</win:CornerRadius>
       <Thickness x:Key="ControlBorderThickness">1.2</Thickness>
 
       <x:Double x:Key="ListItemsSpacing">4</x:Double>

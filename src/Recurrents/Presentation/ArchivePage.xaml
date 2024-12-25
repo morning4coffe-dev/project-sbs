@@ -52,7 +52,7 @@
         </StackPanel>
 
         <ListView ItemsSource="{x:Bind ViewModel.Items}"
-                  SelectedItem="{Binding ViewModel.SelectedItem, Mode=TwoWay}"
+                  SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
                   ScrollViewer.VerticalScrollBarVisibility="Disabled"
                   ScrollViewer.VerticalScrollMode="Disabled"
                   Grid.Row="2"
@@ -122,6 +122,7 @@
               IsEnabled="{x:Bind ViewModel.SelectedItem, Mode=OneWay, Converter={StaticResource EmptyToFalseConverter}}"
               Style="{ThemeResource AccentButtonStyle}"
               HorizontalAlignment="Right"
+              CornerRadius="22"
               Padding="22,0"
               Height="65"
               Command="{x:Bind ViewModel.DeleteCommand}">
@@ -134,6 +135,7 @@
               AutomationProperties.SizeOfSet="2"
               IsEnabled="{x:Bind ViewModel.SelectedItem, Mode=OneWay, Converter={StaticResource EmptyToFalseConverter}}"
               Style="{ThemeResource AccentButtonStyle}"
+              CornerRadius="22"
               Padding="22,0"
               Height="65"
               Command="{x:Bind ViewModel.ArchiveCommand}">

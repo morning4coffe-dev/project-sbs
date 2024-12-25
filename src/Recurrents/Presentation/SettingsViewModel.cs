@@ -1,3 +1,4 @@
+using System.Globalization;
 using WS = Windows.System;
 
 namespace Recurrents.Presentation;
@@ -12,6 +13,8 @@ public partial class SettingsViewModel : ObservableObject
     //private readonly IInteropService _interopService;
 
     public string AppVersion { get; init; }
+
+    public string LastCurrencySync => _currency.LastSync.ToString("F", CultureInfo.CurrentCulture);
 
     [ObservableProperty]
     private User? _user;
@@ -52,7 +55,7 @@ public partial class SettingsViewModel : ObservableObject
             }
 
             _notificationTime = value;
-            //_settingsService.NotificationTime = value;
+            //_settings.NotificationTime = value;
 
             //_ = _itemService.GetItems().ForEach(item => item.ScheduleBilling());
 
@@ -113,7 +116,7 @@ public partial class SettingsViewModel : ObservableObject
         }        
 
         SelectedCurrency = _settingsService.DefaultCurrency;
-        //NotificationTime = _settingsService.NotificationTime;
+        //NotificationTime = _settings.NotificationTime;
     }
 
     [RelayCommand]
