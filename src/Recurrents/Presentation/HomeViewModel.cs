@@ -66,8 +66,6 @@ public partial class HomeViewModel : ObservableObject
 
         BannerHeader = string.Format(localizer["LastDays"], DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
 
-        Sum = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
         var informationalVersion = Assembly
             .GetExecutingAssembly()
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
@@ -82,19 +80,6 @@ public partial class HomeViewModel : ObservableObject
         };
 
         Load();
-    }
-
-    private List<ItemViewModel> GetItems
-        => _itemService
-           .GetItems(item => !item.IsArchived)
-           .OrderBy(i => i.PaymentDate)
-           .ThenBy(i => i.Item.Name)
-           .ToList();
-
-    [RelayCommand]
-    private void AddItem()
-    {
-        IsItemOpen = true;
     }
 
     public async void Load()
@@ -115,8 +100,10 @@ public partial class HomeViewModel : ObservableObject
 
         await _itemService.InitializeAsync();
 
-        RefreshItems();
-        RefreshStats(Items);
+        var items = GetItems;
+
+        RefreshItems(items);
+        RefreshStats(items);
 
         _itemService.OnItemChanged += OnItemChanged;
     }
@@ -126,17 +113,32 @@ public partial class HomeViewModel : ObservableObject
         _itemService.OnItemChanged -= OnItemChanged;
     }
 
-    private async void OnItemChanged(object? sender, ItemViewModel itemVM)
+    private List<ItemViewModel> GetItems
+        => _itemService
+           .GetItems(item => !item.IsArchived)
+           .OrderBy(i => i.PaymentDate)
+           .ThenBy(i => i.Item.Name)
+           .ToList();
+
+    [RelayCommand]
+    private void AddItem()
     {
-        RefreshItems();
-        RefreshStats(Items);
+        IsItemOpen = true;
+    }
+
+    private void OnItemChanged(object? sender, ItemViewModel itemVM)
+    {
+        var items = GetItems;
+
+        RefreshItems(items);
+        RefreshStats(items);
 
         SelectedItem = null;
     }
 
-    private async void RefreshItems()
+    private async void RefreshItems(List<ItemViewModel> currentItems)
     {
-        if (GetItems is { } items && items.Count > 0)
+        if (currentItems is { } items && items.Count > 0)
         {
             await _dispatcher.ExecuteAsync(() =>
             {
@@ -155,27 +157,27 @@ public partial class HomeViewModel : ObservableObject
 
     private async void RefreshStats(IEnumerable<ItemViewModel> items)
     {
-        //try
-        //{
-        //    var days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+        try
+        {
+            var days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
 
-        //    var tasks = items.Select(async item => await _currency.ConvertToDefaultCurrency(
-        //        item.Item?.Billing.BasePrice * item.GetPaymentsInPeriod(days) ?? 0,
-        //        item?.Item?.Billing?.CurrencyId ?? _settings.DefaultCurrency,
-        //        _settings.DefaultCurrency));
+            var tasks = items.Select(async item => await _currency.ConvertToDefaultCurrency(
+                item.Item?.Billing.BasePrice * item.GetPaymentsInPeriod(days) ?? 0,
+                item?.Item?.Billing?.CurrencyId ?? _settings.DefaultCurrency,
+                _settings.DefaultCurrency));
 
-        //    var values = await Task.WhenAll(tasks);
-        //    var sum = values.Sum();
+            var values = await Task.WhenAll(tasks);
+            var sum = values.Sum();
 
-        //    await _dispatcher.ExecuteAsync(() =>
-        //    {
-        //        Sum = $"≈ {Math.Round(sum, 2).ToString("C", CurrencyCache.CurrencyCultures[_settings.DefaultCurrency])}";
-        //    });
-        //}
-        //catch
-        //{
-        //    //TODO: Make show Error more user friendly
-        //    Sum = "Connection error.";
-        //}
+            await _dispatcher.ExecuteAsync(() =>
+            {
+                Sum = $"≈ {Math.Round(sum, 2).ToString("C", CurrencyCache.CurrencyCultures[_settings.DefaultCurrency])}";
+            });
+        }
+        catch
+        {
+            //TODO: Make show Error more user friendly
+            Sum = "Connection error.";
+        }
     }
 }

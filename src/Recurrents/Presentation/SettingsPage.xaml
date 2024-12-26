@@ -20,7 +20,7 @@
       <Setter Property="HorizontalAlignment"
               Value="Stretch" />
       <Setter Property="VerticalAlignment"
-              Value="Center" />
+              Value="Stretch" />
       <Setter Property="Background"
               Value="{ThemeResource CardBackgroundFillColorDefault}" />
       <Setter Property="BorderBrush"
@@ -42,7 +42,7 @@
                     Margin="{TemplateBinding Margin}"
                     ToolTipService.ToolTip="{TemplateBinding Tag}">
               <Grid HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
+                    VerticalAlignment="Center"
                     RowSpacing="4">
                 <Grid.RowDefinitions>
                   <RowDefinition Height="Auto" />
@@ -58,6 +58,8 @@
                 <TextBlock Text="{TemplateBinding Tag}"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
+                           TextWrapping="WrapWholeWords"
+                           HorizontalTextAlignment="Center"
                            Grid.Row="1" />
               </Grid>
             </Border>

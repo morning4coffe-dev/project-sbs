@@ -11,6 +11,7 @@ public class ItemService(
     private readonly IStringLocalizer _localization = localization;
     private readonly ISettingsService _settings = settings;
 
+    private readonly SemaphoreSlim _initializationSemaphore = new(1, 1);
     private bool _isInitialized = false;
 
     private readonly List<ItemViewModel> _items = [];
@@ -24,22 +25,35 @@ public class ItemService(
             return;
         }
 
-        var (items, _) = await _dataService.InitializeDatabaseAsync();
-
-        foreach (var item in items)
+        await _initializationSemaphore.WaitAsync();
+        try
         {
-            var itemVM = new ItemViewModel(item);
-            _items.Add(itemVM);
-
-            if (item?.Billing is { } billing && string.IsNullOrEmpty(billing.CurrencyId))
+            if (_isInitialized)
             {
-                billing.CurrencyId = _settings.DefaultCurrency;
+                return;
             }
 
-            ScheduleBillingNotifications(itemVM);
-        }
+            var (items, _) = await _dataService.InitializeDatabaseAsync();
 
-        _isInitialized = true;
+            foreach (var item in items)
+            {
+                var itemVM = new ItemViewModel(item);
+                _items.Add(itemVM);
+
+                if (item?.Billing is { } billing && string.IsNullOrEmpty(billing.CurrencyId))
+                {
+                    billing.CurrencyId = _settings.DefaultCurrency;
+                }
+
+                ScheduleBillingNotifications(itemVM);
+            }
+
+            _isInitialized = true;
+        }
+        finally
+        {
+            _initializationSemaphore.Release();
+        }
     }
 
     public IEnumerable<ItemViewModel> GetItems(Func<ItemViewModel, bool>? selector = null) =>
@@ -93,6 +107,8 @@ public class ItemService(
 
     private async Task SaveDataAsync(ItemViewModel item)
     {
+        item.Item.ModifiedDate = DateTime.Now;
+
         var itemsList = _items.Select(itemViewModel => itemViewModel.Item).ToList();
 
         if (itemsList is { })
@@ -112,7 +128,7 @@ public class ItemService(
             return;
         }
 
-        var futurePayments = itemVM.GetFuturePayments(5);
+        var futurePayments = itemVM.GetFuturePayments(1);
         foreach (var paymentDate in futurePayments)
         {
             if (_notification.IsNotificationScheduledForDate(paymentDate, item.Id))
