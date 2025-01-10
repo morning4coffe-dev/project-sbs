@@ -173,13 +173,10 @@
             <utu:TabBarItem uen:Region.Name="Home"
                             IsSelected="True"
                             Icon="{toolkit:FontIcon Glyph=&#xE80F;, FontFamily={StaticResource SymbolThemeFontFamily}}" />
-            <!--win:Icon="{toolkit:FontIcon Glyph=&#xE80F;}"-->
             <utu:TabBarItem uen:Region.Name="Archive"
                             Icon="{toolkit:FontIcon Glyph=&#xE7B8;, FontFamily={StaticResource SymbolThemeFontFamily}}" />
-            <!--win:Icon="{toolkit:FontIcon Glyph=&#xE7B8;}"-->
             <utu:TabBarItem uen:Region.Name="Settings"
                             Icon="{toolkit:FontIcon Glyph=&#xE713;, FontFamily={StaticResource SymbolThemeFontFamily}}" />
-            <!--win:Icon="{toolkit:FontIcon Glyph=&#xE713;}"-->
 
           </utu:TabBar.Items>
 

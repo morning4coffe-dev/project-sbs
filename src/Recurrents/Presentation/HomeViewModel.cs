@@ -25,8 +25,8 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     private bool _isItemOpen;
 
-    private ItemViewModel? _selectedItem;
-    public ItemViewModel? SelectedItem
+    private ItemViewModel _selectedItem;
+    public ItemViewModel SelectedItem
     {
         get => _selectedItem;
         set
@@ -91,7 +91,7 @@ public partial class HomeViewModel : ObservableObject
 
         try
         {
-            var currency = await _currency.GetCurrency(CancellationToken.None);
+            await _currency.GetCurrency(CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -102,8 +102,8 @@ public partial class HomeViewModel : ObservableObject
 
         var items = GetItems;
 
-        RefreshItems(items);
-        RefreshStats(items);
+        await RefreshItems(items);
+        await RefreshStats(items);
 
         _itemService.OnItemChanged += OnItemChanged;
     }
@@ -126,17 +126,17 @@ public partial class HomeViewModel : ObservableObject
         IsItemOpen = true;
     }
 
-    private void OnItemChanged(object? sender, ItemViewModel itemVM)
+    private async void OnItemChanged(object? sender, ItemViewModel itemVM)
     {
         var items = GetItems;
 
-        RefreshItems(items);
-        RefreshStats(items);
+        await RefreshItems(items);
+        await RefreshStats(items);
 
         SelectedItem = null;
     }
 
-    private async void RefreshItems(List<ItemViewModel> currentItems)
+    private async Task RefreshItems(List<ItemViewModel> currentItems)
     {
         if (currentItems is { } items && items.Count > 0)
         {
@@ -155,7 +155,7 @@ public partial class HomeViewModel : ObservableObject
         }
     }
 
-    private async void RefreshStats(IEnumerable<ItemViewModel> items)
+    private async Task RefreshStats(IEnumerable<ItemViewModel> items)
     {
         try
         {

@@ -1,7 +1,4 @@
 using Uno.Resizetizer;
-using Recurrents.Services.Notifications;
-
-
 
 #if WINDOWS
 using Microsoft.UI.Composition.SystemBackdrops;

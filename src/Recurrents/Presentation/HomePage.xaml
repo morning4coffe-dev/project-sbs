@@ -14,6 +14,47 @@
       Background="{ThemeResource ApplicationBackground}"
       mc:Ignorable="d not_win">
 
+  <Page.Resources>
+    <DataTemplate x:Key="ItemTemplate"
+                  x:DataType="local:ItemViewModel">
+      <Grid BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderThickness="{StaticResource ControlBorderThickness}"
+            CornerRadius="{StaticResource ControlCornerRadius}"
+            Padding="{StaticResource ListItemsPadding}">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Column -->
+        <StackPanel Spacing="6"
+                    VerticalAlignment="Center">
+          <!--<Rectangle Fill="{x:Bind DisplayTag.Color, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}"
+                             Height="6"
+                             Width="80"
+                             RadiusY="3"
+                             RadiusX="3"
+                             HorizontalAlignment="Left" />-->
+          
+          <TextBlock Text="{x:Bind Item.Name, Mode=OneWay}"
+                     Style="{StaticResource SubtitleTextBlockStyle}" />
+        </StackPanel>
+
+        <!-- Right Column -->
+        <StackPanel Grid.Column="1"
+                    Spacing="8"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+          <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
+                     Text="{x:Bind FormattedPrice, Mode=OneWay}" />
+          <TextBlock Text="{x:Bind FormattedPaymentDate, Mode=OneWay}"
+                     Opacity="0.75" />
+        </StackPanel>
+      </Grid>
+    </DataTemplate>
+  </Page.Resources>
+
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*" />
@@ -39,61 +80,29 @@
                        Style="{StaticResource SubtitleTextBlockStyle}" />
           </comp:DetailsBox>
 
-          <ItemsRepeater ItemsSource="{x:Bind ViewModel.Items, Mode=OneWay}"
-                         utu:ItemsRepeaterExtensions.SelectionMode="Single"
-                         utu:ItemsRepeaterExtensions.SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
-                         ScrollViewer.VerticalScrollMode="Disabled"
-                         Grid.Row="2">
-            <ItemsRepeater.Layout>
-              <StackLayout Orientation="Vertical"
-                           Spacing="{StaticResource ListItemsSpacing}" />
-            </ItemsRepeater.Layout>
+          <not_win:ItemsRepeater ItemsSource="{x:Bind ViewModel.Items, Mode=OneWay}"
+                                   utu:ItemsRepeaterExtensions.SelectionMode="Single"
+                                   utu:ItemsRepeaterExtensions.SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
+                                   ScrollViewer.VerticalScrollMode="Disabled">
+              <ItemsRepeater.Layout>
+                <StackLayout Orientation="Vertical"
+                             Spacing="{StaticResource ListItemsSpacing}" />
+              </ItemsRepeater.Layout>
+              <ItemsRepeater.ItemTemplate>
+                <StaticResource ResourceKey="ItemTemplate" />
+              </ItemsRepeater.ItemTemplate>
+            </not_win:ItemsRepeater>
 
-            <ItemsRepeater.ItemTemplate>
-              <DataTemplate x:DataType="local:ItemViewModel">
-                <Grid BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                      BorderThickness="{StaticResource ControlBorderThickness}"
-                      CornerRadius="{StaticResource ControlCornerRadius}"
-                      Padding="{StaticResource ListItemsPadding}">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                  </Grid.ColumnDefinitions>
+            <win:GridView ItemsSource="{x:Bind ViewModel.Items, Mode=OneWay}"
+                          SelectionMode="Single"
+                          SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
+                          ScrollViewer.VerticalScrollMode="Disabled">
+              <win:GridView.ItemTemplate>
+                <StaticResource ResourceKey="ItemTemplate" />
+              </win:GridView.ItemTemplate>
+            </win:GridView>
 
-                  <!-- Left Column -->
-                  <StackPanel Spacing="6"
-                              VerticalAlignment="Center">
-                    <!--<Rectangle Fill="{x:Bind DisplayTag.Color, Mode=OneWay, Converter={StaticResource ColorToBrushConverter}}"
-                             Height="6"
-                             Width="80"
-                             RadiusY="3"
-                             RadiusX="3"
-                             HorizontalAlignment="Left" />-->
-
-                    <TextBlock Text="{x:Bind Item.Name, Mode=OneWay}"
-                               VerticalAlignment="Center"
-                               Style="{StaticResource SubtitleTextBlockStyle}" />
-                  </StackPanel>
-
-                  <!--Right Column-->
-                  <StackPanel Grid.Column="1"
-                              Spacing="8"
-                              HorizontalAlignment="Right"
-                              VerticalAlignment="Center">
-                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}"
-                               HorizontalAlignment="Right"
-                               Text="{x:Bind FormattedPrice, Mode=OneWay}" />
-                    <TextBlock Text="{x:Bind FormattedPaymentDate, Mode=OneWay}"
-                               HorizontalAlignment="Right"
-                               Opacity="0.75" />
-                  </StackPanel>
-                </Grid>
-              </DataTemplate>
-            </ItemsRepeater.ItemTemplate>
-          </ItemsRepeater>
-
-          <StackPanel Spacing="12"
+            <StackPanel Spacing="12"
                       Grid.Row="4"
                       VerticalAlignment="Center"
                       Margin="0,0,0,20"
