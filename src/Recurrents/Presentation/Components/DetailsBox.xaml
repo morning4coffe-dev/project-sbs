@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Recurrents.Presentation.Components.DetailsBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Recurrents.Presentation.Components"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+
+  <Border CornerRadius="{StaticResource ControlCornerRadius}"
+          Padding="{StaticResource ListItemsPadding}"
+          Background="{ThemeResource CardBackground}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="{StaticResource ControlBorderThickness}">
+
+    <StackPanel Spacing="8">
+
+      <TextBlock Text="{x:Bind HeaderText, Mode=OneWay}"
+                 Visibility="{x:Bind HeaderText, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
+                 Opacity="0.7"
+                 TextWrapping="WrapWholeWords" />
+
+      <TextBlock Text="{x:Bind Text, Mode=OneWay}"
+                 Visibility="{x:Bind Text, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
+                 TextWrapping="WrapWholeWords" />
+
+      <ContentPresenter Content="{x:Bind Content}"
+                        Visibility="{x:Bind Content, Converter={StaticResource EmptyToCollapsedConverter}}" />
+
+    </StackPanel>
+  </Border>
+</UserControl>
