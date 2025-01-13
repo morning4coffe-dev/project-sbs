@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - release/**
+      - dev/**
 
   pull_request:
     types: [opened, synchronize, reopened]
@@ -53,7 +54,7 @@ jobs:
 
       - name: Build Recurrents.Tests (Release)
         shell: pwsh
-        run: msbuild ./Recurrents.Tests/Recurrents.Tests.csproj /p:Configuration=Release /p:OverrideTargetFramework=net8.0 /r
+        run: msbuild ./Recurrents.Tests/Recurrents.Tests.csproj /p:Configuration=Release /p:OverrideTargetFramework=net9.0 /r
 
       - name: Run Unit Tests
         shell: pwsh
